@@ -49,7 +49,14 @@ body {
     justify-content: center;
     align-items: center;
   }
-  .select:hover {
+  .select:not(.active):hover {
+    background-color: var(--second-color);
+    opacity: 100%;
+    color: var(--accent-color);
+  }
+
+  /* Active state for selected timer button (Permanent color change) */
+  .select.active {
     background-color: var(--second-color);
     opacity: 100%;
     color: var(--accent-color);
@@ -120,7 +127,8 @@ body {
     aspect-ratio: 1;
     background-color: var(--accent-color);
     border-radius: 100%;
-    /* border: 1px solid red; */
+    box-shadow: 0 0 15px var(--accent-color);
+
     display: flex;
     justify-content: center;
     align-items: center;
