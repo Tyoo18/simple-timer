@@ -1,11 +1,8 @@
-// Global Variables (Declared with 'let' so they can be assigned later)
 let plps, clockDisplay, animCover, selectButtons;
-let initialTimeInSeconds = 0; // Total duration of the selected timer in seconds
-let timeRemaining = 0; // Current time left in seconds
-let timerInterval = null; // Holds the setInterval ID
-let isRunning = false; // Tracks if the timer is currently running
-
-// --- Utility Functions ---
+let initialTimeInSeconds = 0;
+let timeRemaining = 0;
+let timerInterval = null;
+let isRunning = false;
 
 /**
  * Converts total seconds into a MM:SS string format.
@@ -30,27 +27,6 @@ function formatTime(totalSeconds) {
 function updateClockDisplay(seconds) {
   clockDisplay.textContent = formatTime(seconds);
 }
-
-/**
- * Updates the visual representation of the timer by changing the conic-gradient angle.
- * @param {number} initial - The initial total time in seconds.
- * @param {number} remaining - The time remaining in seconds.
- */
-function updateVisuals(initial, remaining) {
-  // If initial time is 0, reset the visual to fully elapsed (0 remaining)
-  if (initial === 0) {
-    animCover.parentElement.style.setProperty("--progress", 0);
-    return;
-  }
-
-  // Calculate the ratio of time REMAINING (1.0 = full, 0.0 = empty)
-  const remainingRatio = Math.max(0, remaining / initial);
-
-  // Set the CSS variable on the .anim element (which holds the gradient)
-  animCover.parentElement.style.setProperty("--progress", remainingRatio);
-}
-
-// --- Core Timer Logic ---
 
 /**
  * Displays a simple message box when the timer finishes.
@@ -117,7 +93,7 @@ function startTimer() {
   if (timeRemaining > 0 && !isRunning) {
     isRunning = true;
     plps.textContent = "pause";
-    plps.style.backgroundColor = "var(--second-color)";
+    plps.style.backgroundColor = "rgb(94, 92, 92)";
     // Call updateTimer every 1000 milliseconds (1 second)
     timerInterval = setInterval(updateTimer, 1000);
   }
