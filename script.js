@@ -3,6 +3,7 @@ let initialTimeInSeconds = 0;
 let timeRemaining = 0;
 let timerInterval = null;
 let isRunning = false;
+let customMessage = "Timer completed!";
 
 const circle = document.querySelector(".progress-ring__circle");
 const radius = 101.3;
@@ -21,10 +22,7 @@ function setProgress(percent) {
 function formatTime(totalSeconds) {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
-    2,
-    "0"
-  )}`;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
 function updateClockDisplay(seconds) {
@@ -36,10 +34,51 @@ function updateVisuals(total, remaining) {
   setProgress(progress);
 }
 
+function triggerFinishAnimation() {
+  const finishAnim = document.getElementById("finish_animation");
+  if (finishAnim) {
+    finishAnim.classList.remove("active");
+    setTimeout(() => finishAnim.classList.add("active"), 10);
+  }
+}
+
+function playNotificationSound() {
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  // Play three beeps as alarm notification
+  oscillator.frequency.value = 800;
+  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + 0.2);
+  
+  oscillator.start(audioContext.currentTime + 0.3);
+  oscillator.stop(audioContext.currentTime + 0.5);
+  
+  oscillator.start(audioContext.currentTime + 0.6);
+  oscillator.stop(audioContext.currentTime + 0.8);
+}
+
 function timerFinishedNotification() {
   plps.textContent = "DONE!";
   plps.style.backgroundColor = "var(--accent-color)";
   selectButtons.forEach((btn) => btn.classList.remove("active"));
+  
+  // Trigger finish animation
+  triggerFinishAnimation();
+  
+  // Play alarm sound
+  playNotificationSound();
+  
+  // Show custom message
+  const messageDisplay = document.getElementById("current_message");
+  if (messageDisplay) {
+    messageDisplay.textContent = customMessage;
+  }
 }
 
 function setTimer(minutes) {
@@ -53,6 +92,18 @@ function setTimer(minutes) {
   plps.style.backgroundColor = "#797979";
 }
 
+function resetTimer() {
+  stopTimer();
+  timeRemaining = 0;
+  initialTimeInSeconds = 0;
+  updateClockDisplay(0);
+  setProgress(0);
+  plps.textContent = "play";
+  isRunning = false;
+  plps.style.backgroundColor = "#797979";
+  selectButtons.forEach((btn) => btn.classList.remove("active"));
+}
+
 function updateTimer() {
   if (timeRemaining > 0) {
     timeRemaining--;
@@ -61,82 +112,91 @@ function updateTimer() {
     plps.style.backgroundColor = "rgb(94, 92, 92)";
   } else {
     stopTimer();
-    updateClockDisplay(0);
-    updateVisuals(initialTimeInSeconds, 0);
     timerFinishedNotification();
   }
 }
 
 function startTimer() {
-  if (timeRemaining > 0 && !isRunning) {
-    isRunning = true;
-    plps.textContent = "pause";
-    plps.style.backgroundColor = "rgb(94, 92, 92)";
-    timerInterval = setInterval(updateTimer, 1000);
-  }
-}
-
-function pauseTimer() {
-  if (isRunning) {
-    isRunning = false;
-    plps.textContent = "play";
-    plps.style.backgroundColor = "#797979";
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
+  isRunning = true;
+  timerInterval = setInterval(updateTimer, 1000);
+  plps.textContent = "pause";
+  plps.style.backgroundColor = "rgb(94, 92, 92)";
 }
 
 function stopTimer() {
-  clearInterval(timerInterval);
-  timerInterval = null;
+  if (timerInterval !== null) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
   isRunning = false;
 }
 
-function handlePlayPauseReset() {
-  if (timeRemaining === 0 && initialTimeInSeconds !== 0) {
-    setTimer(initialTimeInSeconds / 60);
-    startTimer();
-  } else if (timeRemaining > 0) {
-    if (isRunning) pauseTimer();
-    else startTimer();
-  } else if (initialTimeInSeconds === 0) {
-    setTimer(5);
-    document.getElementById("t5m").classList.add("active");
+function toggleTimer() {
+  if (timeRemaining === 0 && initialTimeInSeconds === 0) {
+    return;
+  }
+  if (isRunning) {
+    stopTimer();
+    plps.textContent = "play";
+    plps.style.backgroundColor = "#797979";
+  } else {
     startTimer();
   }
 }
 
-function initializeApp() {
+window.addEventListener("DOMContentLoaded", function () {
   plps = document.getElementById("btn_timer");
   clockDisplay = document.getElementById("clock");
   selectButtons = document.querySelectorAll(".select");
 
-  plps.addEventListener("click", handlePlayPauseReset);
-
-  selectButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      let minutes = 0;
-      switch (event.target.id) {
-        case "t5m":
-          minutes = 5;
-          break;
-        case "t10m":
-          minutes = 10;
-          break;
-        case "t20m":
-          minutes = 20;
-          break;
-        default:
-          return;
-      }
-      setTimer(minutes);
-      selectButtons.forEach((btn) => btn.classList.remove("active"));
-      event.target.classList.add("active");
-    });
+  // Handle preset time buttons
+  document.getElementById("t5m").addEventListener("click", function () {
+    selectButtons.forEach((btn) => btn.classList.remove("active"));
+    this.classList.add("active");
+    setTimer(5);
   });
 
-  setTimer(5);
-  document.getElementById("t5m").classList.add("active");
-}
+  document.getElementById("t10m").addEventListener("click", function () {
+    selectButtons.forEach((btn) => btn.classList.remove("active"));
+    this.classList.add("active");
+    setTimer(10);
+  });
 
-document.addEventListener("DOMContentLoaded", initializeApp);
+  document.getElementById("t20m").addEventListener("click", function () {
+    selectButtons.forEach((btn) => btn.classList.remove("active"));
+    this.classList.add("active");
+    setTimer(20);
+  });
+
+  // Handle play/pause button
+  plps.addEventListener("click", toggleTimer);
+
+  // Handle quick reset button
+  const resetBtn = document.getElementById("reset_btn");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", resetTimer);
+  }
+
+  // Handle custom message input
+  const saveMessageBtn = document.getElementById("save_message_btn");
+  const customMessageInput = document.getElementById("custom_message");
+  const currentMessageDisplay = document.getElementById("current_message");
+  
+  if (saveMessageBtn && customMessageInput && currentMessageDisplay) {
+    saveMessageBtn.addEventListener("click", function () {
+      const newMessage = customMessageInput.value.trim();
+      if (newMessage) {
+        customMessage = newMessage;
+        currentMessageDisplay.textContent = customMessage;
+        customMessageInput.value = "";
+      }
+    });
+    
+    // Allow Enter key to save message
+    customMessageInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        saveMessageBtn.click();
+      }
+    });
+  }
+});
