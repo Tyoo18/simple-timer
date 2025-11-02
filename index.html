@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
-    <script src="script.js" defer></script>
+    <script defer src="script.js"></script>
     <title>timer app</title>
-  </head>
-  <body>
+</head>
+<body>
     <div class="container">
       <div class="btn">
         <div class="select" id="t5m">5mins</div>
@@ -19,14 +19,24 @@
           <label>Timer</label>
           <div class="clock" id="clock">00:00</div>
           <div class="btnt" id="btn_timer">play</div>
+          <!-- Quick Reset Button -->
+          <div class="reset-btn" id="reset_btn">reset</div>
         </div>
         <div class="visual">
           <svg class="progress-ring">
             <circle class="progress-ring__circle" />
           </svg>
           <div class="cover"></div>
+          <!-- Finish Animation -->
+          <div class="finish-animation" id="finish_animation"></div>
         </div>
       </div>
+      <!-- Custom Completion Message -->
+      <div class="message-section" id="message_section">
+        <input type="text" id="custom_message" class="message-input" placeholder="Enter finish message..." maxlength="30" />
+        <button id="save_message_btn" class="save-btn">Set Message</button>
+        <div class="current-message" id="current_message">Timer completed!</div>
+      </div>
     </div>
-  </body>
+</body>
 </html>
