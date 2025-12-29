@@ -5,26 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
     <script src="script.js" defer></script>
-    <title>timer app</title>
+    <title>Timer</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
   </head>
   <body>
     <div class="container">
-      <div class="btn">
-        <div class="select" id="t5m">5mins</div>
-        <div class="select" id="t10m">10mins</div>
-        <div class="select" id="t20m">20mins</div>
+      <div class="template">
+        <button onclick="setTimer(10)">10 mins</button>
+        <button onclick="setTimer(20)">20 mins</button>
+        <button onclick="setTimer(30)">30 mins</button>
       </div>
-      <div class="base">
-        <div class="timer">
-          <label>Timer</label>
-          <div class="clock" id="clock">00:00</div>
-          <div class="btnt" id="btn_timer">play</div>
-        </div>
-        <div class="visual">
-          <svg class="progress-ring">
-            <circle class="progress-ring__circle" />
+      <div class="timer">
+        <label>Timer</label>
+        <label id="clock">00:00</label>
+        <button id="st-sp">start</button>
+        <div class="indicator">
+          <svg class="progress-ring" viewBox="0 0 100 100">
+            <circle class="progress-ring__circle" cx="50" cy="50" r="35" />
           </svg>
-          <div class="cover"></div>
+
+          <div class="center">
+            <button id="st-ps" class="fa-solid fa-play"></button>
+          </div>
         </div>
       </div>
     </div>
